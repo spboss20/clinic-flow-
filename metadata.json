@@ -1,0 +1,6 @@
+{
+  "name": "ClinicFlow",
+  "description": "Smart healthcare appointment and live queue management platform for India.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
