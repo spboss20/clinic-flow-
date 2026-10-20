@@ -1,9 +1,11 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -11,6 +13,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
@@ -35,6 +38,7 @@ fun ReceptionistDashboardScreen(
     onCheckInPatient: (queueEntryId: String) -> Unit,
     onCallNextPatient: (doctorId: String) -> Unit,
     onMarkNoShow: (queueEntryId: String) -> Unit,
+    onAskAiClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var searchQuery by remember { mutableStateOf("") }
@@ -102,6 +106,71 @@ fun ReceptionistDashboardScreen(
                             text = Strings.get("walk_in_registration", language),
                             fontWeight = FontWeight.Bold,
                             fontSize = (14 * textScale.scale).sp
+                        )
+                    }
+                }
+            }
+        }
+
+        // ClinicFlow AI Staff Copilot Card
+        item {
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = ClinicTealLight),
+                border = BorderStroke(1.dp, ClinicTeal.copy(alpha = 0.3f)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("receptionist_copilot_card")
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(ClinicTeal),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = "Staff Copilot",
+                            tint = Color.White
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (language == Language.HINDI) "क्लिनिकफ्लो स्टाफ को-पायलट" else "ClinicFlow Staff Copilot",
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = ClinicNavy,
+                                fontSize = (14 * textScale.scale).sp
+                            )
+                        )
+                        Text(
+                            text = if (language == Language.HINDI) "दैनिक शेड्यूल सारांश, खाली स्लॉट व कतार प्रबंधन सहायता" else "Schedule summary, open slots & queue operations helper",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = ClinicTealDark,
+                                fontSize = (12 * textScale.scale).sp
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = onAskAiClick,
+                        colors = ButtonDefaults.buttonColors(containerColor = ClinicTeal),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.defaultMinSize(minHeight = 36.dp).testTag("open_staff_copilot_button")
+                    ) {
+                        Text(
+                            text = if (language == Language.HINDI) "खोलें" else "Open",
+                            fontSize = (12 * textScale.scale).sp,
+                            fontWeight = FontWeight.Bold
                         )
                     }
                 }

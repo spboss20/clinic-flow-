@@ -42,6 +42,7 @@ fun BookingFlowScreen(
     textScale: TextScale,
     onConfirmBooking: (doctorId: String, clinicId: String, date: String, time: String, patientName: String, patientPhone: String, patientAge: Int) -> Result<Appointment>,
     onTrackQueueClick: (token: String, doctorId: String) -> Unit,
+    onAskAiClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -237,6 +238,56 @@ fun BookingFlowScreen(
             .padding(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
+        // AI Guidance Banner
+        Card(
+            shape = RoundedCornerShape(12.dp),
+            colors = CardDefaults.cardColors(containerColor = ClinicTealLight),
+            border = BorderStroke(1.dp, ClinicTeal.copy(alpha = 0.35f)),
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onAskAiClick() }
+                .testTag("booking_ask_ai_banner")
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 14.dp, vertical = 10.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.SmartToy,
+                    contentDescription = null,
+                    tint = ClinicTeal,
+                    modifier = Modifier.size(22.dp)
+                )
+                Spacer(modifier = Modifier.width(10.dp))
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(
+                        text = if (language == Language.HINDI) "स्लॉट या प्रक्रिया समझने में मदद चाहिए?" else "Need help choosing a slot or doctor?",
+                        fontWeight = FontWeight.Bold,
+                        color = ClinicNavy,
+                        fontSize = (13 * textScale.scale).sp
+                    )
+                    Text(
+                        text = if (language == Language.HINDI) "क्लिनिकफ्लो एआई से पूछें (English/हिंदी)" else "Ask ClinicFlow AI for real-time guidance",
+                        color = ClinicNavy.copy(alpha = 0.75f),
+                        fontSize = (11 * textScale.scale).sp
+                    )
+                }
+                TextButton(
+                    onClick = onAskAiClick,
+                    contentPadding = PaddingValues(horizontal = 6.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "Ask AI",
+                        fontWeight = FontWeight.Bold,
+                        color = ClinicTeal,
+                        fontSize = 12.sp
+                    )
+                }
+            }
+        }
+
         // Doctor Summary Card
         Card(
             shape = RoundedCornerShape(14.dp),

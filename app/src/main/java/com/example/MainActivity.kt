@@ -73,6 +73,7 @@ class MainActivity : ComponentActivity() {
                             onRoleChange = { viewModel.switchRole(it) },
                             onNotificationClick = { viewModel.navigateTo(Screen.Notifications) },
                             unreadNotificationCount = notifications.count { !it.isRead },
+                            onAiAssistantClick = { viewModel.navigateTo(Screen.AiAssistant) },
                             canNavigateBack = uiState.backStack.size > 1,
                             onBackClick = { viewModel.navigateBack() }
                         )
@@ -110,7 +111,8 @@ class MainActivity : ComponentActivity() {
                                         viewModel.navigateTo(Screen.DoctorSearch)
                                     },
                                     onViewAllAppointmentsClick = { viewModel.navigateTo(Screen.MyAppointments) },
-                                    onBookAppointmentClick = { viewModel.navigateTo(Screen.DoctorSearch) }
+                                    onBookAppointmentClick = { viewModel.navigateTo(Screen.DoctorSearch) },
+                                    onAskAiClick = { viewModel.navigateTo(Screen.AiAssistant) }
                                 )
                             }
 
@@ -130,7 +132,8 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onBookDoctor = { doc ->
                                         viewModel.navigateTo(Screen.BookingFlow(doc.id))
-                                    }
+                                    },
+                                    onAskAiClick = { viewModel.navigateTo(Screen.AiAssistant) }
                                 )
                             }
 
@@ -163,7 +166,8 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onTrackQueueClick = { token, docId ->
                                         viewModel.setTrackingTarget(token, docId)
-                                    }
+                                    },
+                                    onAskAiClick = { viewModel.navigateTo(Screen.AiAssistant) }
                                 )
                             }
 
@@ -246,7 +250,8 @@ class MainActivity : ComponentActivity() {
                                     onCompleteConsultation = { qId -> viewModel.completeConsultation(qId) },
                                     onMarkNoShow = { qId -> viewModel.markNoShow(qId) },
                                     onAnnounceDelay = { mins, reason -> viewModel.announceDelay(primaryDoctor.id, mins, reason) },
-                                    onTogglePauseQueue = { viewModel.togglePauseQueue(primaryDoctor.id) }
+                                    onTogglePauseQueue = { viewModel.togglePauseQueue(primaryDoctor.id) },
+                                    onAskAiClick = { viewModel.navigateTo(Screen.AiAssistant) }
                                 )
                             }
 
@@ -261,7 +266,8 @@ class MainActivity : ComponentActivity() {
                                     },
                                     onCheckInPatient = { qId -> viewModel.checkInPatient(qId) },
                                     onCallNextPatient = { dId -> viewModel.callNextPatient(dId) },
-                                    onMarkNoShow = { qId -> viewModel.markNoShow(qId) }
+                                    onMarkNoShow = { qId -> viewModel.markNoShow(qId) },
+                                    onAskAiClick = { viewModel.navigateTo(Screen.AiAssistant) }
                                 )
                             }
 
@@ -276,6 +282,32 @@ class MainActivity : ComponentActivity() {
                                     textScale = textScale,
                                     onApproveApplication = { appId -> viewModel.approveDoctorApplication(appId) },
                                     onRejectApplication = { appId, reason -> viewModel.rejectDoctorApplication(appId, reason) }
+                                )
+                            }
+
+                            is Screen.AiAssistant -> {
+                                AiAssistantScreen(
+                                    messages = uiState.aiMessages,
+                                    isThinking = uiState.isAiThinking,
+                                    isGeminiLiveConfigured = uiState.isGeminiLiveConfigured,
+                                    currentRole = uiState.currentRole,
+                                    language = language,
+                                    textScale = textScale,
+                                    onSendPrompt = { prompt -> viewModel.sendAiPrompt(prompt) },
+                                    onClearChat = { viewModel.clearAiChat() },
+                                    onSpeakMessage = { text ->
+                                        viewModel.setTtsSpeaking(true)
+                                        ttsManager?.speak(text, isHindi = language == Language.HINDI)
+                                    },
+                                    onBookDoctorClick = { doctorId ->
+                                        viewModel.navigateTo(Screen.BookingFlow(doctorId))
+                                    },
+                                    onTrackQueueClick = { token, docId ->
+                                        viewModel.setTrackingTarget(token, docId)
+                                    },
+                                    onConfirmDraftDelay = { draft ->
+                                        viewModel.confirmAiDraftDelay(draft)
+                                    }
                                 )
                             }
                         }
@@ -322,10 +354,10 @@ fun ClinicFlowBottomBar(
                     label = { Text("Doctors", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
                 )
                 NavigationBarItem(
-                    selected = currentScreen is Screen.MyAppointments,
-                    onClick = { onNavigate(Screen.MyAppointments) },
-                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = "Appointments") },
-                    label = { Text("Bookings", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
+                    selected = currentScreen is Screen.AiAssistant,
+                    onClick = { onNavigate(Screen.AiAssistant) },
+                    icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "ClinicFlow AI") },
+                    label = { Text("AI Helper", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
                 )
                 NavigationBarItem(
                     selected = currentScreen is Screen.QueueTracking,
@@ -334,10 +366,10 @@ fun ClinicFlowBottomBar(
                     label = { Text("Queue", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
                 )
                 NavigationBarItem(
-                    selected = currentScreen is Screen.FamilyMembers,
-                    onClick = { onNavigate(Screen.FamilyMembers) },
-                    icon = { Icon(Icons.Default.People, contentDescription = "Family") },
-                    label = { Text("Family", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
+                    selected = currentScreen is Screen.MyAppointments,
+                    onClick = { onNavigate(Screen.MyAppointments) },
+                    icon = { Icon(Icons.Default.CalendarMonth, contentDescription = "Appointments") },
+                    label = { Text("Bookings", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
                 )
             }
             UserRole.DOCTOR -> {
@@ -346,6 +378,12 @@ fun ClinicFlowBottomBar(
                     onClick = { onNavigate(Screen.DoctorDashboard) },
                     icon = { Icon(Icons.Default.MedicalServices, contentDescription = "Doctor Desk") },
                     label = { Text("Doctor Desk", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
+                )
+                NavigationBarItem(
+                    selected = currentScreen is Screen.AiAssistant,
+                    onClick = { onNavigate(Screen.AiAssistant) },
+                    icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Doctor Copilot") },
+                    label = { Text("AI Copilot", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
                 )
                 NavigationBarItem(
                     selected = currentScreen is Screen.Notifications,
@@ -360,6 +398,12 @@ fun ClinicFlowBottomBar(
                     onClick = { onNavigate(Screen.ReceptionistDashboard) },
                     icon = { Icon(Icons.Default.AssignmentInd, contentDescription = "Reception") },
                     label = { Text("Reception Desk", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
+                )
+                NavigationBarItem(
+                    selected = currentScreen is Screen.AiAssistant,
+                    onClick = { onNavigate(Screen.AiAssistant) },
+                    icon = { Icon(Icons.Default.AutoAwesome, contentDescription = "Staff Copilot") },
+                    label = { Text("AI Copilot", fontSize = (11 * textScale.scale).sp, fontWeight = FontWeight.Bold) }
                 )
                 NavigationBarItem(
                     selected = currentScreen is Screen.Notifications,

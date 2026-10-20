@@ -11,7 +11,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
-import androidx.compose.material.icons.outlined.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -40,6 +39,7 @@ fun ClinicFlowTopBar(
     onTextScaleChange: (TextScale) -> Unit,
     onRoleChange: (UserRole) -> Unit,
     onNotificationClick: () -> Unit,
+    onAiAssistantClick: () -> Unit = {},
     unreadNotificationCount: Int = 0,
     canNavigateBack: Boolean = false,
     onBackClick: () -> Unit = {}
@@ -115,7 +115,7 @@ fun ClinicFlowTopBar(
                     }
                 }
 
-                // Action Controls: Language, Text Size, Role Switcher
+                // Action Controls: Language, Text Size, AI Assistant, Role Switcher
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     // Language Switcher
                     OutlinedButton(
@@ -172,6 +172,30 @@ fun ClinicFlowTopBar(
                                 }
                             )
                         }
+                    }
+
+                    Spacer(modifier = Modifier.width(6.dp))
+
+                    // Ask AI Button
+                    FilledTonalButton(
+                        onClick = onAiAssistantClick,
+                        colors = ButtonDefaults.filledTonalButtonColors(
+                            containerColor = ClinicTealContainer,
+                            contentColor = ClinicTealDark
+                        ),
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp),
+                        modifier = Modifier.height(36.dp).testTag("topbar_ask_ai_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = "Ask AI",
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "AI",
+                            style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.ExtraBold)
+                        )
                     }
 
                     Spacer(modifier = Modifier.width(6.dp))

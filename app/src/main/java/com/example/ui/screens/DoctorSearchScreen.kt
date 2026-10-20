@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -43,6 +44,7 @@ fun DoctorSearchScreen(
     onMaxFeeChange: (Int?) -> Unit,
     onSelectDoctor: (Doctor) -> Unit,
     onBookDoctor: (Doctor) -> Unit,
+    onAskAiClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val specialities = listOf(
@@ -125,7 +127,84 @@ fun DoctorSearchScreen(
                         .testTag("doctor_search_input")
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(10.dp))
+
+                // AI Search Assistant Card
+                Card(
+                    shape = RoundedCornerShape(12.dp),
+                    colors = CardDefaults.cardColors(containerColor = ClinicTealLight),
+                    border = BorderStroke(1.dp, ClinicTeal.copy(alpha = 0.35f)),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onAskAiClick() }
+                        .testTag("search_ask_ai_banner")
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 14.dp, vertical = 10.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .clip(CircleShape)
+                                .background(ClinicTeal),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.SmartToy,
+                                contentDescription = null,
+                                tint = Color.White,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = if (language == Language.HINDI) "एआई से बोलकर डॉक्टर खोजें" else "Ask AI to find your doctor",
+                                    fontWeight = FontWeight.Bold,
+                                    color = ClinicNavy,
+                                    fontSize = (13 * textScale.scale).sp
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Surface(
+                                    color = ClinicTeal,
+                                    shape = RoundedCornerShape(4.dp)
+                                ) {
+                                    Text(
+                                        text = "Gemini",
+                                        color = Color.White,
+                                        style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold, fontSize = 9.sp),
+                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp)
+                                    )
+                                }
+                            }
+                            Text(
+                                text = if (language == Language.HINDI)
+                                    "\"मुझे कल शाम को जनरल फिजिशियन चाहिए\""
+                                else
+                                    "Try: \"General physician under ₹500\" or \"Earliest dentist\"",
+                                color = ClinicNavy.copy(alpha = 0.75f),
+                                fontSize = (11 * textScale.scale).sp
+                            )
+                        }
+                        TextButton(
+                            onClick = onAskAiClick,
+                            contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                text = "Ask AI",
+                                fontWeight = FontWeight.Bold,
+                                color = ClinicTeal,
+                                fontSize = 12.sp
+                            )
+                        }
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(10.dp))
 
                 // Speciality Filter Chips
                 LazyRow(

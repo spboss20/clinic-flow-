@@ -1,5 +1,6 @@
 package com.example.ui.screens
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -50,6 +51,7 @@ fun HomeScreen(
     onSpecialityClick: (String) -> Unit,
     onViewAllAppointmentsClick: () -> Unit,
     onBookAppointmentClick: () -> Unit,
+    onAskAiClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val specialities = listOf(
@@ -155,6 +157,82 @@ fun HomeScreen(
                             }
                         }
                     }
+                }
+            }
+        }
+
+        // Ask ClinicFlow AI Entry Card
+        item {
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                colors = CardDefaults.cardColors(containerColor = ClinicTealLight),
+                border = BorderStroke(1.dp, ClinicTeal.copy(alpha = 0.35f)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable { onAskAiClick() }
+                    .testTag("home_ask_ai_card")
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(46.dp)
+                            .clip(CircleShape)
+                            .background(ClinicTeal),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.SmartToy,
+                            contentDescription = "Ask ClinicFlow AI",
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Text(
+                                text = if (language == Language.HINDI) "क्लिनिकफ्लो एआई से पूछें" else "Ask ClinicFlow AI",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    color = ClinicNavy,
+                                    fontSize = (16 * textScale.scale).sp
+                                )
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Surface(
+                                color = ClinicTeal,
+                                shape = RoundedCornerShape(4.dp)
+                            ) {
+                                Text(
+                                    text = "Gemini",
+                                    color = Color.White,
+                                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = if (language == Language.HINDI)
+                                "डॉक्टर खोजें, स्लॉट समझें या लाइव कतार टोकन जांचें (हिंदी/English)"
+                            else
+                                "Find doctors, understand slots, or check live queue in English or हिंदी",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = ClinicNavy.copy(alpha = 0.75f),
+                                fontSize = (12 * textScale.scale).sp
+                            )
+                        )
+                    }
+                    Icon(
+                        imageVector = Icons.Default.ChevronRight,
+                        contentDescription = null,
+                        tint = ClinicTeal
+                    )
                 }
             }
         }

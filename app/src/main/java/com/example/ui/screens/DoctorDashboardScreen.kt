@@ -42,6 +42,7 @@ fun DoctorDashboardScreen(
     onMarkNoShow: (queueEntryId: String) -> Unit,
     onAnnounceDelay: (minutes: Int, reason: String) -> Unit,
     onTogglePauseQueue: () -> Unit,
+    onAskAiClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var showDelayDialog by remember { mutableStateOf(false) }
@@ -305,6 +306,71 @@ fun DoctorDashboardScreen(
                         imageVector = if (isQueuePaused) Icons.Default.PlayCircle else Icons.Default.PauseCircle,
                         contentDescription = "Pause or Resume"
                     )
+                }
+            }
+        }
+
+        // ClinicFlow AI Doctor Copilot Card
+        item {
+            Card(
+                shape = RoundedCornerShape(12.dp),
+                colors = CardDefaults.cardColors(containerColor = ClinicTealLight),
+                border = androidx.compose.foundation.BorderStroke(1.dp, ClinicTeal.copy(alpha = 0.3f)),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("doctor_copilot_card")
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(14.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .clip(CircleShape)
+                            .background(ClinicTeal),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AutoAwesome,
+                            contentDescription = "AI Copilot",
+                            tint = Color.White
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = if (language == Language.HINDI) "क्लिनिकफ्लो डॉक्टर को-पायलट" else "ClinicFlow Doctor Copilot",
+                            style = MaterialTheme.typography.titleSmall.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = ClinicNavy,
+                                fontSize = (14 * textScale.scale).sp
+                            )
+                        )
+                        Text(
+                            text = if (language == Language.HINDI) "शेड्यूल सारांश, रिक्त स्लॉट व देरी की पूर्व-सूचना का मसौदा" else "Summarise schedule, find open slots & draft delay notice",
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = ClinicTealDark,
+                                fontSize = (12 * textScale.scale).sp
+                            )
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = onAskAiClick,
+                        colors = ButtonDefaults.buttonColors(containerColor = ClinicTeal),
+                        shape = RoundedCornerShape(8.dp),
+                        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                        modifier = Modifier.defaultMinSize(minHeight = 36.dp).testTag("open_doctor_copilot_button")
+                    ) {
+                        Text(
+                            text = if (language == Language.HINDI) "खोलें" else "Open",
+                            fontSize = (12 * textScale.scale).sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
             }
         }
